@@ -1,60 +1,84 @@
 package com.company.usermanagement.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.aspectj.lang.annotation.Before;
-import org.junit.FixMethodOrder;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.company.usermanagement.UserManagementApplication;
 import com.company.usermanagement.request.FeatureRequest;
 import com.company.usermanagement.response.FeatureResponse;
 import com.company.usermanagement.service.FeatureService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@RunWith(MockitoJUnitRunner.class)
-@SpringBootTest(classes = UserManagementApplication.class)
-@AutoConfigureMockMvc
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@RunWith(SpringRunner.class)
+@WebMvcTest
 public class FeatureControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
 
-	@Mock
+	@MockBean
 	private FeatureService featureService;
 
-	@InjectMocks
-	private FeatureController featureController;
+	FeatureRequest feature = null;
+	
+	FeatureRequest getFeature = null;
 
-	@org.junit.Before
+	@Before
 	public void setup() {
+		feature = new FeatureRequest();
+		feature.setFeatureName("feature123");
+		feature.setEmail("email1@email.com");
+		feature.setEnable(true);
+		
+		getFeature = new FeatureRequest();
+		getFeature.setFeatureName("feature123");
+		getFeature.setEmail("email1@email.com");
+	}
 
-		// this must be called for the @Mock annotations above to be processed
-		// and for the mock service to be injected into the controller under
-		// test.
-		MockitoAnnotations.initMocks(this);
+	@Test
+	public void createFeature() throws Exception {
 
-		this.mockMvc = MockMvcBuilders.standaloneSetup(featureController).build();
+		Mockito.when(featureService.createFeature(feature)).thenReturn(true);
 
+		mockMvc.perform(post("/feature").contentType(MediaType.APPLICATION_JSON).content(toJson(feature))
+				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+
+	}
+
+	@Test
+	public void updateFeature() throws Exception {
+		Mockito.when(featureService.updateFeature(feature)).thenReturn(true);
+
+		mockMvc.perform(put("/feature").contentType(MediaType.APPLICATION_JSON).content(toJson(feature))
+				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+	}
+
+	@Test
+	public void getFeature() throws Exception {
+		Mockito.when(featureService.getFeatureByEmail(getFeature)).thenReturn(true);
+
+		MvcResult mvcResult = mockMvc
+				.perform(get("/feature?featureName=" + feature.getFeatureName() + "&email=" + feature.getEmail())
+						.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+				.andReturn();
+		String content = mvcResult.getResponse().getContentAsString();
+		ObjectMapper objectWrapper = new ObjectMapper();
+		FeatureResponse reseponse = objectWrapper.readValue(content, FeatureResponse.class);
+		assertEquals(true, reseponse.isCanAcess());
 	}
 
 	public static String toJson(final Object obj) {
@@ -72,45 +96,4 @@ public class FeatureControllerTest {
 			throw new RuntimeException(e);
 		}
 	}
-
-	@Test
-	public void createFeature() throws Exception {
-
-		when(featureService.createFeature("feature123", "email1@email.com", true)).thenReturn(true);
-
-		FeatureRequest feature = new FeatureRequest();
-		feature.setFeatureName("feature123");
-		feature.setEmail("email1@email.com");
-		feature.setEnable(true);
-
-		mockMvc.perform(post("/feature").contentType(MediaType.APPLICATION_JSON).content(toJson(feature))
-				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-
-	}
-
-	@Test
-	public void updateFeature() throws Exception {
-		when(featureService.updateFeature("feature123", "email1@email.com", false)).thenReturn(true);
-
-		FeatureRequest feature = new FeatureRequest();
-		feature.setFeatureName("feature123");
-		feature.setEmail("email1@email.com");
-		feature.setEnable(false);
-
-		mockMvc.perform(put("/feature").contentType(MediaType.APPLICATION_JSON).content(toJson(feature))
-				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-	}
-
-	@Test
-	public void getFeature() throws Exception {
-		when(featureService.getFeatureByEmail("feature1", "email@email.com")).thenReturn(true);
-
-		MvcResult mvcResult = mockMvc.perform(get("/feature?featureName=feature1&email=email@email.com")
-				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andReturn();
-		String content = mvcResult.getResponse().getContentAsString();
-		ObjectMapper objectWrapper = new ObjectMapper();
-		FeatureResponse reseponse = objectWrapper.readValue(content, FeatureResponse.class);
-		assertEquals(true, reseponse.isCanAcess());
-	}
-
 }

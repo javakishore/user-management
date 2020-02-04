@@ -21,7 +21,7 @@ public class FeatureController {
 
 	@GetMapping("/feature")
 	public ResponseEntity<FeatureResponse> getFeatureByEmail(FeatureRequest request) {
-		boolean access = featureService.getFeatureByEmail(request.getFeatureName(), request.getEmail());
+		boolean access = featureService.getFeatureByEmail(request);
 		FeatureResponse response = new FeatureResponse();
 		response.setCanAcess(access);
 		return ResponseEntity.ok(response);
@@ -30,8 +30,7 @@ public class FeatureController {
 
 	@PostMapping("/feature")
 	public ResponseEntity<?> createtFeature(@RequestBody FeatureRequest request) {
-		boolean updated = featureService.createFeature(request.getFeatureName(), request.getEmail(),
-				request.isEnable());
+		boolean updated = featureService.createFeature(request);
 
 		return updated == true ? new ResponseEntity<Object>(HttpStatus.OK)
 				: new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
@@ -40,8 +39,7 @@ public class FeatureController {
 
 	@PutMapping("/feature")
 	public ResponseEntity<?> updateFeature(@RequestBody FeatureRequest request) {
-		boolean updated = featureService.updateFeature(request.getFeatureName(), request.getEmail(),
-				request.isEnable());
+		boolean updated = featureService.updateFeature(request);
 
 		return updated == true ? new ResponseEntity<Object>(HttpStatus.OK)
 				: new ResponseEntity<Object>(HttpStatus.NOT_MODIFIED);

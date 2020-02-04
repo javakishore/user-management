@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.company.usermanagement.entity.Feature;
 import com.company.usermanagement.repository.FeatureRepository;
+import com.company.usermanagement.request.FeatureRequest;
 import com.company.usermanagement.service.FeatureService;
 
 @Service
@@ -15,18 +16,18 @@ public class FeatureServiceImpl implements FeatureService {
 	@Autowired
 	private FeatureRepository featureRepository;
 
-	public boolean getFeatureByEmail(String featureName, String email) {
-		Optional<Feature> feature = featureRepository.findFeatureByEmailAndFeatureName(email, featureName);
+	public boolean getFeatureByEmail(FeatureRequest req) {
+		Optional<Feature> feature = featureRepository.findFeatureByEmailAndFeatureName(req.getEmail(), req.getFeatureName());
 		return feature.isPresent() ? feature.get().isEnable() : false;
 	}
 
-	public boolean createFeature(String featureName, String email, boolean enable) {
+	public boolean createFeature(FeatureRequest req) {
 
 		try {
 			Feature feature = new Feature();
-			feature.setFeatureName(featureName);
-			feature.setEmail(email);
-			feature.setEnable(enable);
+			feature.setFeatureName(req.getFeatureName());
+			feature.setEmail(req.getEmail());
+			feature.setEnable(req.isEnable());
 			Feature saved = featureRepository.save(feature);
 
 			if (saved != null)
@@ -38,11 +39,11 @@ public class FeatureServiceImpl implements FeatureService {
 		}
 	}
 
-	public boolean updateFeature(String featureName, String email, boolean enable) {
-		return featureRepository.findFeatureByEmailAndFeatureName(email, featureName).map(feature -> {
+	public boolean updateFeature(FeatureRequest req) {
+		return featureRepository.findFeatureByEmailAndFeatureName(req.getEmail(), req.getFeatureName()).map(feature -> {
 
 			try {
-				feature.setEnable(enable);
+				feature.setEnable(req.isEnable());
 				featureRepository.save(feature);
 			} catch (Exception e) {
 				return false;
