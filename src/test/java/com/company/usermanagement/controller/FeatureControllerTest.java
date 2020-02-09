@@ -18,8 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import com.company.usermanagement.request.FeatureRequest;
-import com.company.usermanagement.response.FeatureResponse;
+import com.company.usermanagement.model.Feature;
 import com.company.usermanagement.service.FeatureService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,18 +32,18 @@ public class FeatureControllerTest {
 	@MockBean
 	private FeatureService featureService;
 
-	FeatureRequest feature = null;
+	Feature feature = null;
 	
-	FeatureRequest getFeature = null;
+	Feature getFeature = null;
 
 	@Before
 	public void setup() {
-		feature = new FeatureRequest();
+		feature = new Feature();
 		feature.setFeatureName("feature123");
 		feature.setEmail("email1@email.com");
 		feature.setEnable(true);
 		
-		getFeature = new FeatureRequest();
+		getFeature = new Feature();
 		getFeature.setFeatureName("feature123");
 		getFeature.setEmail("email1@email.com");
 	}
@@ -76,9 +75,8 @@ public class FeatureControllerTest {
 						.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
 				.andReturn();
 		String content = mvcResult.getResponse().getContentAsString();
-		ObjectMapper objectWrapper = new ObjectMapper();
-		FeatureResponse reseponse = objectWrapper.readValue(content, FeatureResponse.class);
-		assertEquals(true, reseponse.isCanAcess());
+
+		assertEquals(true, content.contains("true"));
 	}
 
 	public static String toJson(final Object obj) {

@@ -1,1 +1,1 @@
-create table feature(feature_id number(10) primary key,feature_name varchar(50) not null,email varchar(100) not null,enable boolean default false not null);
+create table feature(feature_id number(10) primary key auto_increment,feature_name varchar(50) not null,email varchar(100) not null,enable boolean default false not null);

@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.company.usermanagement.entity.Feature;
+import com.company.usermanagement.model.Feature;
 
 @Repository
 public interface FeatureRepository extends CrudRepository<Feature, Long> {
