@@ -10,6 +10,7 @@ import com.company.usermanagement.model.Feature;
 import com.company.usermanagement.repository.FeatureRepository;
 import com.company.usermanagement.model.Feature;
 import com.company.usermanagement.service.FeatureService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class FeatureServiceImpl implements FeatureService {
@@ -17,11 +18,13 @@ public class FeatureServiceImpl implements FeatureService {
     @Autowired
     private FeatureRepository featureRepository;
 
+    @Transactional
     public boolean getFeatureByEmail(Feature req) throws Exception {
         Optional<Feature> feature = featureRepository.findFeatureByEmailAndFeatureName(req.getEmail(), req.getFeatureName());
         return feature.isPresent() ? feature.get().isEnable() : false;
     }
 
+    @Transactional
     public boolean createFeature(Feature req) throws Exception {
 
         try {
@@ -33,6 +36,7 @@ public class FeatureServiceImpl implements FeatureService {
         }
     }
 
+    @Transactional
     public boolean updateFeature(Feature req) throws Exception {
         Optional<Feature> feature = featureRepository.findById(req.getFeatureId());
         if (feature.isPresent()) {
